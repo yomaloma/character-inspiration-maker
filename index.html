@@ -1,28 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<!-- Hello, this is whatever. -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Character Inspiration Meme Maker</title>
     
-    <!-- External Library for Downloading Image -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@400;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,900;1,400&family=Oswald:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,900;1,400&family=Roboto:ital,wght@0,400;0,900;1,400&display=swap" rel="stylesheet">
     
-    <!-- Link to Custom CSS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <!-- Top Control Bar -->
     <div class="controls">
-        <button id="download-btn">Download Meme</button>
-        <p class="instructions">Double-click squares to upload (or change) images. Click and drag to move. Scroll to zoom. Click text to edit.</p>
+        <div class="top-bar">
+            <button id="download-btn">Download</button>
+            <button id="copy-btn">Copy Image</button>
+            <div class="right-controls">
+                <button id="quick-reset-btn" class="reset-btn">Reset</button>
+                <button id="settings-btn" class="icon-btn">☰ Settings</button>
+            </div>
+        </div>
+        <p class="instructions">Double-tap/click squares to upload. Drag to move. Scroll/pinch to zoom. Tap text to edit.</p>
     </div>
 
+    <!-- Settings Overlay -->
+    <div id="settings-overlay" class="overlay">
+        <div class="overlay-content">
+            <div class="overlay-header">
+                <h2>Customize</h2>
+                <button id="close-settings" class="icon-btn">✕</button>
+            </div>
+            
+            <!-- Tab Navigation -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="tab-theme">Theme</button>
+                <button class="tab-btn" data-tab="tab-title">Title</button>
+                <button class="tab-btn" data-tab="tab-name">Name</button>
+                <button class="tab-btn" data-tab="tab-music">Music</button>
+                <button class="tab-btn" data-tab="tab-reset">Reset</button>
+            </div>
+
+            <div class="settings-scroll">
+                
+                <!-- THEME TAB -->
+                <div id="tab-theme" class="tab-pane active">
+                    <div class="settings-group">
+                        <h3>Colors</h3>
+                        <label>Poster Background <input type="color" id="bg-color" value="#ffffff"></label>
+                        <label>Box Border Color <input type="color" id="border-color" value="#000000"></label>
+                    </div>
+                    <div class="settings-group">
+                        <h3>Borders</h3>
+                        <label>Thickness <div class="slider-group"><input type="range" id="border-thickness" min="0" max="10" step="1" value="3"><span id="border-thickness-val">3</span>px</div></label>
+                        <label>Style <select id="border-style">
+                            <option value="solid">Solid</option>
+                            <option value="dashed">Dashed</option>
+                            <option value="dotted">Dotted</option>
+                            <option value="double">Double</option>
+                        </select></label>
+                        <label>Corners <div class="slider-group"><input type="range" id="border-radius" min="0" max="50" step="1" value="0"><span id="border-radius-val">0</span>px</div></label>
+                    </div>
+                    <div class="settings-group">
+                        <h3>Layout</h3>
+                        <label>Show Title Line <input type="checkbox" id="show-line" checked></label>
+                        <label>Show Image Borders <input type="checkbox" id="show-borders" checked></label>
+                    </div>
+                </div>
+
+                <!-- TITLE TAB -->
+                <div id="tab-title" class="tab-pane">
+                    <div class="settings-group">
+                        <h3>Title Settings</h3>
+                        <label>Font <select id="title-font" class="font-select"></select></label>
+                        <label>Color <input type="color" id="title-color" value="#000000"></label>
+                        <label>Size <div class="slider-group"><input type="range" id="title-size" min="2" max="8" step="0.5" value="4.5"><span id="title-size-val">4.5</span></div></label>
+                        <label>Alignment <select id="title-align">
+                            <option value="center">Center</option>
+                            <option value="left">Left</option>
+                            <option value="right">Right</option>
+                        </select></label>
+                        <label>Tracking <div class="slider-group"><input type="range" id="title-tracking" min="-2" max="10" step="0.5" value="0"><span id="title-tracking-val">0</span>px</div></label>
+                        <label>Text Shadow <input type="checkbox" id="title-shadow"></label>
+                        <label>Text Outline <input type="checkbox" id="title-outline"></label>
+                    </div>
+                </div>
+
+                <!-- NAME TAB -->
+                <div id="tab-name" class="tab-pane">
+                    <div class="settings-group">
+                        <h3>Character Name Settings</h3>
+                        <label>Font <select id="name-font" class="font-select"></select></label>
+                        <label>Color <input type="color" id="name-color" value="#555555"></label>
+                        <label>Size <div class="slider-group"><input type="range" id="name-size" min="1.5" max="6" step="0.5" value="3"><span id="name-size-val">3</span></div></label>
+                        <label>Alignment <select id="name-align">
+                            <option value="center">Center</option>
+                            <option value="left">Left</option>
+                            <option value="right">Right</option>
+                        </select></label>
+                        <label>Tracking <div class="slider-group"><input type="range" id="name-tracking" min="-2" max="10" step="0.5" value="0"><span id="name-tracking-val">0</span>px</div></label>
+                        <label>Text Shadow <input type="checkbox" id="name-shadow"></label>
+                        <label>Text Outline <input type="checkbox" id="name-outline"></label>
+                    </div>
+                </div>
+
+                <!-- MUSIC TAB -->
+                <div id="tab-music" class="tab-pane">
+                    <div class="settings-group">
+                        <h3>Inspo Music Settings</h3>
+                        <label>Font <select id="music-font" class="font-select"></select></label>
+                        <label>Color <input type="color" id="music-color" value="#333333"></label>
+                        <label>Size <div class="slider-group"><input type="range" id="music-size" min="1.5" max="5" step="0.5" value="2.5"><span id="music-size-val">2.5</span></div></label>
+                        <label>Alignment <select id="music-align">
+                            <option value="center">Center</option>
+                            <option value="left">Left</option>
+                            <option value="right">Right</option>
+                        </select></label>
+                        <label>Tracking <div class="slider-group"><input type="range" id="music-tracking" min="-2" max="10" step="0.5" value="0"><span id="music-tracking-val">0</span>px</div></label>
+                        <label>Text Shadow <input type="checkbox" id="music-shadow"></label>
+                    </div>
+                </div>
+
+                <!-- RESET TAB -->
+                <div id="tab-reset" class="tab-pane">
+                    <div class="settings-group danger-zone">
+                        <h3>Danger Zone</h3>
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 0;">This will permanently delete all uploaded images, text, and custom styles.</p>
+                        <button id="reset-btn" class="danger-btn">Reset Everything</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- The Meme Poster -->
     <div id="poster">
         <!-- Row 1 -->
         <div class="cell img-cell" ondblclick="document.getElementById('file1').click()">
             <input type="file" id="file1" accept="image/*" onchange="loadImage(event, 'img1')">
+            <div class="delete-btn" id="delete-img1" onclick="clearImage(event, 'img1')">✕</div>
             <span class="upload-label" id="label1">+</span>
             <img class="uploaded-img" id="img1" src="" alt="">
         </div>
@@ -34,6 +155,7 @@
 
         <div class="cell img-cell" ondblclick="document.getElementById('file4').click()">
             <input type="file" id="file4" accept="image/*" onchange="loadImage(event, 'img4')">
+            <div class="delete-btn" id="delete-img4" onclick="clearImage(event, 'img4')">✕</div>
             <span class="upload-label" id="label4">+</span>
             <img class="uploaded-img" id="img4" src="" alt="">
         </div>
@@ -41,19 +163,21 @@
         <!-- Row 2 -->
         <div class="cell img-cell" ondblclick="document.getElementById('file2').click()">
             <input type="file" id="file2" accept="image/*" onchange="loadImage(event, 'img2')">
+            <div class="delete-btn" id="delete-img2" onclick="clearImage(event, 'img2')">✕</div>
             <span class="upload-label" id="label2">+</span>
             <img class="uploaded-img" id="img2" src="" alt="">
         </div>
 
-        <!-- Center Art Cell -->
         <div class="cell center-art-cell" ondblclick="document.getElementById('fileCenter').click()">
             <input type="file" id="fileCenter" accept="image/*" onchange="loadImage(event, 'imgCenter')">
+            <div class="delete-btn" id="delete-imgCenter" onclick="clearImage(event, 'imgCenter')">✕</div>
             <span class="upload-label" id="labelCenter">+ ART</span>
             <img class="uploaded-img" id="imgCenter" src="" alt="">
         </div>
 
         <div class="cell img-cell" ondblclick="document.getElementById('file5').click()">
             <input type="file" id="file5" accept="image/*" onchange="loadImage(event, 'img5')">
+            <div class="delete-btn" id="delete-img5" onclick="clearImage(event, 'img5')">✕</div>
             <span class="upload-label" id="label5">+</span>
             <img class="uploaded-img" id="img5" src="" alt="">
         </div>
@@ -61,24 +185,24 @@
         <!-- Row 3 -->
         <div class="cell img-cell" ondblclick="document.getElementById('file3').click()">
             <input type="file" id="file3" accept="image/*" onchange="loadImage(event, 'img3')">
+            <div class="delete-btn" id="delete-img3" onclick="clearImage(event, 'img3')">✕</div>
             <span class="upload-label" id="label3">+</span>
             <img class="uploaded-img" id="img3" src="" alt="">
         </div>
 
-        <!-- Music Cell -->
         <div class="cell text-cell">
-            <div class="thick-line"></div>
+            <div class="thick-line" id="title-line"></div>
             <div id="music-box" contenteditable="true" spellcheck="false" data-placeholder="Enter inspo music here..."></div>
         </div>
 
         <div class="cell img-cell" ondblclick="document.getElementById('file6').click()">
             <input type="file" id="file6" accept="image/*" onchange="loadImage(event, 'img6')">
+            <div class="delete-btn" id="delete-img6" onclick="clearImage(event, 'img6')">✕</div>
             <span class="upload-label" id="label6">+</span>
             <img class="uploaded-img" id="img6" src="" alt="">
         </div>
     </div>
 
-    <!-- Link to Custom JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
