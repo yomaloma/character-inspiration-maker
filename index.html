@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Hello, this is whatever. -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Inspiration Meme Maker</title>
+    
+    <!-- External Library for Downloading Image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Link to Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="controls">
+        <button id="download-btn">Download Meme</button>
+        <p class="instructions">Double-click squares to upload (or change) images. Click and drag to move. Scroll to zoom. Click text to edit.</p>
+    </div>
+
+    <div id="poster">
+        <!-- Row 1 -->
+        <div class="cell img-cell" ondblclick="document.getElementById('file1').click()">
+            <input type="file" id="file1" accept="image/*" onchange="loadImage(event, 'img1')">
+            <span class="upload-label" id="label1">+</span>
+            <img class="uploaded-img" id="img1" src="" alt="">
+        </div>
+
+        <div class="cell text-cell">
+            <h1 id="display-title" contenteditable="true" spellcheck="false">CHARACTER INSPIRATION</h1>
+            <div id="char-name" contenteditable="true" spellcheck="false" data-placeholder="Character Name"></div>
+        </div>
+
+        <div class="cell img-cell" ondblclick="document.getElementById('file4').click()">
+            <input type="file" id="file4" accept="image/*" onchange="loadImage(event, 'img4')">
+            <span class="upload-label" id="label4">+</span>
+            <img class="uploaded-img" id="img4" src="" alt="">
+        </div>
+
+        <!-- Row 2 -->
+        <div class="cell img-cell" ondblclick="document.getElementById('file2').click()">
+            <input type="file" id="file2" accept="image/*" onchange="loadImage(event, 'img2')">
+            <span class="upload-label" id="label2">+</span>
+            <img class="uploaded-img" id="img2" src="" alt="">
+        </div>
+
+        <!-- Center Art Cell -->
+        <div class="cell center-art-cell" ondblclick="document.getElementById('fileCenter').click()">
+            <input type="file" id="fileCenter" accept="image/*" onchange="loadImage(event, 'imgCenter')">
+            <span class="upload-label" id="labelCenter">+ ART</span>
+            <img class="uploaded-img" id="imgCenter" src="" alt="">
+        </div>
+
+        <div class="cell img-cell" ondblclick="document.getElementById('file5').click()">
+            <input type="file" id="file5" accept="image/*" onchange="loadImage(event, 'img5')">
+            <span class="upload-label" id="label5">+</span>
+            <img class="uploaded-img" id="img5" src="" alt="">
+        </div>
+
+        <!-- Row 3 -->
+        <div class="cell img-cell" ondblclick="document.getElementById('file3').click()">
+            <input type="file" id="file3" accept="image/*" onchange="loadImage(event, 'img3')">
+            <span class="upload-label" id="label3">+</span>
+            <img class="uploaded-img" id="img3" src="" alt="">
+        </div>
+
+        <!-- Music Cell -->
+        <div class="cell text-cell">
+            <div class="thick-line"></div>
+            <div id="music-box" contenteditable="true" spellcheck="false" data-placeholder="Enter inspo music here..."></div>
+        </div>
+
+        <div class="cell img-cell" ondblclick="document.getElementById('file6').click()">
+            <input type="file" id="file6" accept="image/*" onchange="loadImage(event, 'img6')">
+            <span class="upload-label" id="label6">+</span>
+            <img class="uploaded-img" id="img6" src="" alt="">
+        </div>
+    </div>
+
+    <!-- Link to Custom JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>

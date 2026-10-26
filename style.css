@@ -1,0 +1,224 @@
+:root {
+    --border-color: #000;
+    --bg-color: #f0f0f0;
+    --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--bg-color);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Controls Panel */
+.controls {
+    background: white;
+    padding: 15px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    max-width: 600px;
+    text-align: center;
+}
+
+button {
+    background-color: #000;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background-color: #333;
+}
+
+.instructions {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* The Meme Poster */
+#poster {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr 1fr;
+    grid-template-rows: repeat(3, 1fr);
+    gap: 15px;
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 1 / 1;
+    background-color: white;
+    padding: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    position: relative; 
+}
+
+/* Grid Cells */
+.cell {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 0; /* Prevents grid row from expanding */
+}
+
+/* Image Cells (Sides) */
+.img-cell {
+    border: 3px solid var(--border-color);
+    overflow: hidden; 
+    background-color: #fafafa;
+    cursor: pointer;
+    z-index: 10; 
+}
+
+.img-cell input[type="file"], .center-art-cell input[type="file"] {
+    display: none;
+}
+
+.upload-label {
+    font-size: 40px;
+    color: #ccc;
+    pointer-events: none; 
+    user-select: none;
+}
+
+.uploaded-img {
+    position: absolute;
+    max-width: none;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-drag: none;
+    display: none;
+}
+
+.uploaded-img:active {
+    cursor: grabbing;
+}
+
+/* Center Art Cell */
+.center-art-cell {
+    overflow: visible; 
+    z-index: 5; 
+    border: none;
+    cursor: pointer;
+}
+
+/* Text Cells */
+.text-cell {
+    border: none;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    z-index: 20; 
+    background: transparent;
+    pointer-events: none;
+    overflow: hidden; 
+}
+
+.text-cell > * {
+    pointer-events: auto; 
+}
+
+/* HIDE SCROLLBARS FOR CLEAN LOOK */
+#display-title::-webkit-scrollbar,
+#char-name::-webkit-scrollbar,
+#music-box::-webkit-scrollbar {
+    display: none;
+}
+#display-title, #char-name, #music-box {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+#display-title {
+    font-size: 2rem;
+    font-weight: 900;
+    margin: 0;
+    text-transform: uppercase;
+    line-height: 1.1;
+    outline: none;
+    width: 100%;
+    text-align: center;
+    max-height: 100%;
+    overflow-y: auto;
+    word-break: break-word;
+}
+
+/* Seamless Character Name */
+#char-name {
+    font-size: 1.2rem;
+    font-weight: normal;
+    font-style: italic;
+    color: #555;
+    margin-top: 10px;
+    outline: none;
+    text-align: center;
+    width: 90%;
+    max-height: 100%;
+    overflow-y: auto;
+    min-height: 1.5em; 
+    word-break: break-word;
+}
+
+#char-name:empty:before {
+    content: attr(data-placeholder);
+    color: #aaa;
+}
+
+.thick-line {
+    width: 100%;
+    height: 8px;
+    background-color: var(--border-color);
+    margin-bottom: 15px;
+    flex-shrink: 0; 
+}
+
+/* Music Section */
+#music-box {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: #333;
+    outline: none;
+    text-align: center;
+    width: 100%;
+    height: 100%; 
+    max-height: 120px; 
+    overflow-y: auto; 
+    word-break: break-word;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+#music-box:empty:before {
+    content: attr(data-placeholder);
+    color: #aaa;
+    font-style: italic;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 600px) {
+    #display-title { font-size: 1.2rem; }
+    #char-name { font-size: 1rem; }
+    #music-box { font-size: 0.8rem; }
+    .upload-label { font-size: 24px; }
+    #poster { padding: 10px; gap: 8px; }
+}
