@@ -375,7 +375,7 @@ function updateStyleVariable(key, value, uiElementId) {
     } else if (key.includes('shadow')) {
         appState.styles[key] = value ? '2px 2px 4px rgba(0,0,0,0.8)' : 'none';
     } else if (key.includes('stroke')) {
-        appState.styles[key] = value ? '2px black' : '0px transparent';
+        appState.styles[key] = value ? '1px black' : '0px transparent';
     } else {
         appState.styles[key] = value;
     }
