@@ -214,6 +214,7 @@ button:hover { background-color: #333; }
     cursor: grab;
     user-select: none;
     -webkit-user-drag: none;
+    -webkit-touch-callout: none;
     display: none;
     touch-action: none; 
     transform-origin: center center; 

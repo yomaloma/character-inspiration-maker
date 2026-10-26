@@ -264,8 +264,11 @@ function applyTransform(img) {
     img.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(${s})`;
 }
 
+// Update the event listener setup for images
 document.querySelectorAll('.uploaded-img').forEach(img => {
     img.addEventListener('pointerdown', dragStart);
+    // ADDED: Prevent native context menu on long press (mobile) or right-click (desktop)
+    img.addEventListener('contextmenu', (e) => e.preventDefault());
 });
 
 function dragStart(e) {
