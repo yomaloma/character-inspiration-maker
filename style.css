@@ -12,6 +12,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow-x: hidden;
 }
 
 /* Controls Panel */
@@ -27,6 +28,8 @@ body {
     align-items: center;
     max-width: 600px;
     text-align: center;
+    width: 90%;
+    box-sizing: border-box;
 }
 
 button {
@@ -56,7 +59,8 @@ button:hover {
 #poster {
     display: grid;
     grid-template-columns: 1fr 1.3fr 1fr;
-    grid-template-rows: repeat(3, 1fr);
+    /* THIS FIXES THE STRETCHING: minmax(0, 1fr) forces rows to stay equal */
+    grid-template-rows: repeat(3, minmax(0, 1fr)); 
     gap: 15px;
     width: 100%;
     max-width: 800px;
@@ -66,6 +70,10 @@ button:hover {
     box-sizing: border-box;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     position: relative; 
+    touch-action: none; 
+    
+    /* Enable Container Queries */
+    container-type: inline-size;
 }
 
 /* Grid Cells */
@@ -74,7 +82,9 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 0; /* Prevents grid row from expanding */
+    min-height: 0;
+    min-width: 0;
+    touch-action: none; 
 }
 
 /* Image Cells (Sides) */
@@ -104,6 +114,7 @@ button:hover {
     user-select: none;
     -webkit-user-drag: none;
     display: none;
+    touch-action: none; 
 }
 
 .uploaded-img:active {
@@ -126,7 +137,7 @@ button:hover {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 10px;
+    padding: 5px;
     z-index: 20; 
     background: transparent;
     pointer-events: none;
@@ -137,19 +148,20 @@ button:hover {
     pointer-events: auto; 
 }
 
-/* HIDE SCROLLBARS FOR CLEAN LOOK */
+/* HIDE SCROLLBARS */
 #display-title::-webkit-scrollbar,
 #char-name::-webkit-scrollbar,
 #music-box::-webkit-scrollbar {
     display: none;
 }
 #display-title, #char-name, #music-box {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
 }
 
+/* CONTAINER QUERIES: Font size scales with the poster width, not the screen width */
 #display-title {
-    font-size: 2rem;
+    font-size: 4.5cqw; 
     font-weight: 900;
     margin: 0;
     text-transform: uppercase;
@@ -160,22 +172,24 @@ button:hover {
     max-height: 100%;
     overflow-y: auto;
     word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 /* Seamless Character Name */
 #char-name {
-    font-size: 1.2rem;
+    font-size: 3cqw;
     font-weight: normal;
     font-style: italic;
     color: #555;
-    margin-top: 10px;
+    margin-top: 5px;
     outline: none;
     text-align: center;
-    width: 90%;
+    width: 95%;
     max-height: 100%;
     overflow-y: auto;
     min-height: 1.5em; 
     word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 #char-name:empty:before {
@@ -185,24 +199,24 @@ button:hover {
 
 .thick-line {
     width: 100%;
-    height: 8px;
+    height: 1.5cqw;
     background-color: var(--border-color);
-    margin-bottom: 15px;
+    margin-bottom: 2cqw;
     flex-shrink: 0; 
 }
 
 /* Music Section */
 #music-box {
-    font-size: 0.95rem;
-    line-height: 1.4;
+    font-size: 2.5cqw;
+    line-height: 1.3;
     color: #333;
     outline: none;
     text-align: center;
     width: 100%;
     height: 100%; 
-    max-height: 120px; 
     overflow-y: auto; 
     word-break: break-word;
+    overflow-wrap: break-word;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -215,10 +229,8 @@ button:hover {
 }
 
 /* Mobile Adjustments */
-@media (max-width: 600px) {
-    #display-title { font-size: 1.2rem; }
-    #char-name { font-size: 1rem; }
-    #music-box { font-size: 0.8rem; }
-    .upload-label { font-size: 24px; }
+@media (max-width: 768px) {
+    body { padding: 10px; }
     #poster { padding: 10px; gap: 8px; }
+    .upload-label { font-size: 10cqw; }
 }
