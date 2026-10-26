@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Character Inspiration Meme Maker</title>
     
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@400;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Montserrat:ital,wght@0,400;0,900;1,400&family=Oswald:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,900;1,400&family=Roboto:ital,wght@0,400;0,900;1,400&display=swap" rel="stylesheet">
@@ -36,7 +35,6 @@
                 <button id="close-settings" class="icon-btn">✕</button>
             </div>
             
-            <!-- Tab Navigation -->
             <div class="tabs">
                 <button class="tab-btn active" data-tab="tab-theme">Theme</button>
                 <button class="tab-btn" data-tab="tab-title">Title</button>
@@ -46,7 +44,6 @@
             </div>
 
             <div class="settings-scroll">
-                
                 <!-- THEME TAB -->
                 <div id="tab-theme" class="tab-pane active">
                     <div class="settings-group">
@@ -133,7 +130,6 @@
                         <button id="reset-btn" class="danger-btn">Reset Everything</button>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -141,7 +137,7 @@
     <!-- The Meme Poster -->
     <div id="poster">
         <!-- Row 1 -->
-        <div class="cell img-cell" ondblclick="document.getElementById('file1').click()">
+        <div class="cell img-cell">
             <input type="file" id="file1" accept="image/*" onchange="loadImage(event, 'img1')">
             <div class="delete-btn" id="delete-img1" onclick="clearImage(event, 'img1')">✕</div>
             <span class="upload-label" id="label1">+</span>
@@ -153,7 +149,7 @@
             <div id="char-name" contenteditable="true" spellcheck="false" data-placeholder="Character Name"></div>
         </div>
 
-        <div class="cell img-cell" ondblclick="document.getElementById('file4').click()">
+        <div class="cell img-cell">
             <input type="file" id="file4" accept="image/*" onchange="loadImage(event, 'img4')">
             <div class="delete-btn" id="delete-img4" onclick="clearImage(event, 'img4')">✕</div>
             <span class="upload-label" id="label4">+</span>
@@ -161,21 +157,21 @@
         </div>
 
         <!-- Row 2 -->
-        <div class="cell img-cell" ondblclick="document.getElementById('file2').click()">
+        <div class="cell img-cell">
             <input type="file" id="file2" accept="image/*" onchange="loadImage(event, 'img2')">
             <div class="delete-btn" id="delete-img2" onclick="clearImage(event, 'img2')">✕</div>
             <span class="upload-label" id="label2">+</span>
             <img class="uploaded-img" id="img2" src="" alt="">
         </div>
 
-        <div class="cell center-art-cell" ondblclick="document.getElementById('fileCenter').click()">
+        <div class="cell center-art-cell">
             <input type="file" id="fileCenter" accept="image/*" onchange="loadImage(event, 'imgCenter')">
             <div class="delete-btn" id="delete-imgCenter" onclick="clearImage(event, 'imgCenter')">✕</div>
             <span class="upload-label" id="labelCenter">+ ART</span>
             <img class="uploaded-img" id="imgCenter" src="" alt="">
         </div>
 
-        <div class="cell img-cell" ondblclick="document.getElementById('file5').click()">
+        <div class="cell img-cell">
             <input type="file" id="file5" accept="image/*" onchange="loadImage(event, 'img5')">
             <div class="delete-btn" id="delete-img5" onclick="clearImage(event, 'img5')">✕</div>
             <span class="upload-label" id="label5">+</span>
@@ -183,7 +179,7 @@
         </div>
 
         <!-- Row 3 -->
-        <div class="cell img-cell" ondblclick="document.getElementById('file3').click()">
+        <div class="cell img-cell">
             <input type="file" id="file3" accept="image/*" onchange="loadImage(event, 'img3')">
             <div class="delete-btn" id="delete-img3" onclick="clearImage(event, 'img3')">✕</div>
             <span class="upload-label" id="label3">+</span>
@@ -195,7 +191,7 @@
             <div id="music-box" contenteditable="true" spellcheck="false" data-placeholder="Enter inspo music here..."></div>
         </div>
 
-        <div class="cell img-cell" ondblclick="document.getElementById('file6').click()">
+        <div class="cell img-cell">
             <input type="file" id="file6" accept="image/*" onchange="loadImage(event, 'img6')">
             <div class="delete-btn" id="delete-img6" onclick="clearImage(event, 'img6')">✕</div>
             <span class="upload-label" id="label6">+</span>

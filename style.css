@@ -1,14 +1,12 @@
 :root {
-    /* Theme */
     --poster-bg: #ffffff;
     --border-color: #000000;
     --border-thickness: 3px;
-    --border-width: 3px; /* Actual applied width */
+    --border-width: 3px;
     --border-style: solid;
     --border-radius: 0px;
     --show-line: block;
     
-    /* Title */
     --title-font: 'Bebas Neue', sans-serif;
     --title-color: #000000;
     --title-align: center;
@@ -17,7 +15,6 @@
     --title-shadow: none;
     --title-stroke: 0px transparent;
     
-    /* Name */
     --name-font: 'Montserrat', sans-serif;
     --name-color: #555555;
     --name-align: center;
@@ -26,7 +23,6 @@
     --name-shadow: none;
     --name-stroke: 0px transparent;
     
-    /* Music */
     --music-font: 'Montserrat', sans-serif;
     --music-color: #333333;
     --music-align: center;
@@ -74,7 +70,7 @@ body {
 .right-controls {
     display: flex;
     gap: 10px;
-    flex: none; /* Prevents container from stretching */
+    flex: none; 
 }
 
 button {
@@ -96,11 +92,10 @@ button:hover { background-color: #333; }
 .icon-btn {
     background-color: #eee;
     color: #000;
-    flex: none; /* Prevents generic stretching */
+    flex: none; 
 }
 .icon-btn:hover { background-color: #ddd; }
 
-/* Ensure the Close button is always a perfect square */
 #close-settings {
     width: 36px;
     height: 36px;
@@ -141,7 +136,7 @@ button:hover { background-color: #333; }
     box-sizing: border-box;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     position: relative; 
-    touch-action: none; 
+    touch-action: pan-y; /* Allows vertical scrolling on the poster but catches gestures */
     container-type: inline-size;
 }
 
@@ -153,7 +148,6 @@ button:hover { background-color: #333; }
     align-items: center;
     min-height: 0;
     min-width: 0;
-    touch-action: none; 
     overflow: hidden; 
 }
 
@@ -166,6 +160,7 @@ button:hover { background-color: #333; }
     background-color: rgba(0,0,0,0.02);
     cursor: pointer;
     z-index: 10; 
+    touch-action: manipulation; /* Fix for iOS Safari taps */
 }
 
 .img-cell input[type="file"], .center-art-cell input[type="file"] {
@@ -189,7 +184,7 @@ button:hover { background-color: #333; }
     border-radius: 50%;
     width: 24px;
     height: 24px;
-    display: none; /* Hidden by default */
+    display: none; 
     justify-content: center;
     align-items: center;
     font-size: 14px;
@@ -214,9 +209,9 @@ button:hover { background-color: #333; }
     cursor: grab;
     user-select: none;
     -webkit-user-drag: none;
-    -webkit-touch-callout: none;
+    -webkit-touch-callout: none; 
     display: none;
-    touch-action: none; 
+    touch-action: none; /* Crucial for dragging without page scroll */
     transform-origin: center center; 
 }
 
@@ -228,6 +223,7 @@ button:hover { background-color: #333; }
     z-index: 5; 
     border: none;
     cursor: pointer;
+    touch-action: manipulation;
 }
 
 /* Text Cells */
@@ -259,7 +255,7 @@ button:hover { background-color: #333; }
     font-family: var(--title-font);
     font-size: var(--title-size); 
     color: var(--title-color);
-    -webkit-text-fill-color: var(--title-color); /* Fix mobile rendering */
+    -webkit-text-fill-color: var(--title-color); 
     text-align: var(--title-align);
     letter-spacing: var(--title-tracking);
     text-shadow: var(--title-shadow);
@@ -281,7 +277,7 @@ button:hover { background-color: #333; }
     font-family: var(--name-font);
     font-size: var(--name-size);
     color: var(--name-color);
-    -webkit-text-fill-color: var(--name-color); /* Fix mobile rendering */
+    -webkit-text-fill-color: var(--name-color); 
     text-align: var(--name-align);
     letter-spacing: var(--name-tracking);
     text-shadow: var(--name-shadow);
@@ -318,7 +314,7 @@ button:hover { background-color: #333; }
     font-family: var(--music-font);
     font-size: var(--music-size);
     color: var(--music-color);
-    -webkit-text-fill-color: var(--music-color); /* Fix mobile rendering */
+    -webkit-text-fill-color: var(--music-color); 
     text-align: var(--music-align);
     letter-spacing: var(--music-tracking);
     text-shadow: var(--music-shadow);
@@ -450,5 +446,5 @@ select { padding: 5px; border-radius: 4px; border: 1px solid #ccc; outline: none
     
     .top-bar { flex-direction: column; }
     .right-controls { width: 100%; justify-content: space-between; }
-    .right-controls button { flex: 1; } /* Lets the reset and settings buttons share the row nicely on mobile */
+    .right-controls button { flex: 1; } 
 }

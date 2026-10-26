@@ -52,7 +52,6 @@ const defaultState = {
 
 let appState = JSON.parse(JSON.stringify(defaultState));
 
-// Populate Font Selects
 document.querySelectorAll('.font-select').forEach(select => {
     GOOGLE_FONTS.forEach(font => {
         const option = document.createElement('option');
@@ -75,13 +74,11 @@ function applyStylesToDOM() {
     const s = appState.styles;
     const root = document.documentElement;
 
-    // 1. Determine Actual Border Width
     const isVisible = s['--show-borders'];
     const thickness = s['--border-thickness'];
     const finalWidth = isVisible ? thickness : '0px';
     root.style.setProperty('--border-width', finalWidth);
 
-    // 2. Apply all other styles
     for (const [key, value] of Object.entries(s)) {
         if (key !== '--show-borders' && key !== '--border-width') {
             root.style.setProperty(key, value);
@@ -96,7 +93,6 @@ function loadState() {
             const parsed = JSON.parse(saved);
             appState = { ...appState, ...parsed }; 
             
-            // Fallbacks for older saved states
             if (appState.styles['--show-borders'] === undefined) appState.styles['--show-borders'] = true;
             
             applyStylesToDOM();
@@ -116,7 +112,6 @@ function loadState() {
                     img.style.display = 'block';
                     if(label) label.style.display = 'none';
                     
-                    // Explicitly show the delete button
                     document.getElementById('delete-' + id).style.display = 'flex';
                     
                     img.dataset.scale = imgData.scale;
@@ -145,13 +140,13 @@ let startX = 0, startY = 0;
 let initialX = 0, initialY = 0;
 let isPinching = false;
 let touchDistance = 0;
+let didDrag = false; // Used to differentiate between a tap and a drag
 
 function compressImage(file, callback) {
     const reader = new FileReader();
     reader.onload = function(e) {
         const img = new Image();
         img.onload = function() {
-            // FIX 3: Prevent division by zero on corrupted images
             if (img.width === 0 || img.height === 0) {
                 alert("Error: The uploaded file is corrupted or not a valid image.");
                 return;
@@ -201,13 +196,12 @@ function loadImage(event, imgId) {
     const file = event.target.files[0];
     if (file) {
         compressImage(file, function(compressedDataUrl) {
-            if (!compressedDataUrl) return; // Exit if compression failed
+            if (!compressedDataUrl) return;
 
             const img = document.getElementById(imgId);
             const label = document.getElementById('label' + imgId.replace('img', ''));
             const cell = img.parentElement;
             
-            // FIX 2: Use onload to accurately wait for the image to be ready
             img.onload = function() {
                 const cellWidth = cell.clientWidth;
                 const cellHeight = cell.clientHeight;
@@ -224,8 +218,6 @@ function loadImage(event, imgId) {
                 img.dataset.x = 0;
                 img.dataset.y = 0;
                 applyTransform(img);
-                
-                // Clear onload to prevent memory leaks
                 img.onload = null;
             };
 
@@ -264,10 +256,8 @@ function applyTransform(img) {
     img.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(${s})`;
 }
 
-// Update the event listener setup for images
 document.querySelectorAll('.uploaded-img').forEach(img => {
     img.addEventListener('pointerdown', dragStart);
-    // ADDED: Prevent native context menu on long press (mobile) or right-click (desktop)
     img.addEventListener('contextmenu', (e) => e.preventDefault());
 });
 
@@ -279,14 +269,24 @@ function dragStart(e) {
     startX = e.clientX; startY = e.clientY;
     initialX = parseFloat(activeImg.dataset.x) || 0;
     initialY = parseFloat(activeImg.dataset.y) || 0;
+    didDrag = false; 
     e.preventDefault(); 
 }
 
 document.addEventListener('pointermove', (e) => {
     if (!activeImg || isPinching) return;
     if(e.pointerType === 'touch') e.preventDefault();
-    activeImg.dataset.x = initialX + (e.clientX - startX);
-    activeImg.dataset.y = initialY + (e.clientY - startY);
+    
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    
+    // If moved more than 5 pixels, consider it a drag
+    if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+        didDrag = true;
+    }
+
+    activeImg.dataset.x = initialX + dx;
+    activeImg.dataset.y = initialY + dy;
     applyTransform(activeImg);
 });
 
@@ -352,6 +352,37 @@ document.querySelectorAll('.uploaded-img').forEach(img => {
     });
 });
 
+// --- CUSTOM TAP DETECTOR (iOS SAFARI FIX) ---
+// Replaces onDblClick which is unreliable on Safari
+let lastTapTime = 0;
+const DOUBLE_TAP_DELAY = 350; // ms
+
+document.querySelectorAll('.img-cell, .center-art-cell').forEach(cell => {
+    cell.addEventListener('click', function(e) {
+        // Ignore if clicking the delete button or if the user just finished dragging an image
+        if (e.target.classList.contains('delete-btn') || didDrag) {
+            didDrag = false;
+            return;
+        }
+
+        const currentTime = Date.now();
+        const timeSinceLastTap = currentTime - lastTapTime;
+
+        if (timeSinceLastTap < DOUBLE_TAP_DELAY && timeSinceLastTap > 0) {
+            // Double tap detected
+            const fileInput = cell.querySelector('input[type="file"]');
+            if (fileInput) {
+                fileInput.click();
+            }
+            lastTapTime = 0; // Reset
+        } else {
+            // First tap
+            lastTapTime = currentTime;
+        }
+    });
+});
+
+
 // --- SETTINGS UI & BINDINGS ---
 const overlay = document.getElementById('settings-overlay');
 document.getElementById('settings-btn').addEventListener('click', () => overlay.classList.add('active'));
@@ -367,7 +398,6 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 
 function updateStyleVariable(key, value, uiElementId) {
-    // FIX 1: Change key.includes('outline') to key.includes('stroke')
     if (key === '--show-borders') {
         appState.styles['--show-borders'] = value; 
     } else if (key === '--show-line') {
@@ -390,10 +420,8 @@ function updateStyleVariable(key, value, uiElementId) {
 }
 
 const bindings = [
-    // Changed 'input' to 'change' for all color pickers to prevent mobile render crashes
     { id: 'bg-color', prop: '--poster-bg', event: 'change' },
     { id: 'border-color', prop: '--border-color', event: 'change' },
-    
     { id: 'border-thickness', prop: '--border-thickness', event: 'input', suffix: 'px' },
     { id: 'border-style', prop: '--border-style', event: 'change' },
     { id: 'border-radius', prop: '--border-radius', event: 'input', suffix: 'px' },
@@ -442,7 +470,6 @@ bindings.forEach(bind => {
 function updateSettingsUI() {
     const s = appState.styles;
     
-    // Theme
     document.getElementById('bg-color').value = s['--poster-bg'];
     document.getElementById('border-color').value = s['--border-color'];
     document.getElementById('border-thickness').value = s['--border-thickness'].replace('px', '');
@@ -453,7 +480,6 @@ function updateSettingsUI() {
     document.getElementById('show-borders').checked = s['--show-borders'];
     document.getElementById('show-line').checked = s['--show-line'] === 'block';
 
-    // Title
     document.getElementById('title-font').value = s['--title-font'];
     document.getElementById('title-color').value = s['--title-color'];
     document.getElementById('title-size').value = s['--title-size'].replace('cqw', '');
@@ -464,7 +490,6 @@ function updateSettingsUI() {
     document.getElementById('title-shadow').checked = s['--title-shadow'] !== 'none';
     document.getElementById('title-outline').checked = s['--title-stroke'] !== '0px transparent';
 
-    // Name
     document.getElementById('name-font').value = s['--name-font'];
     document.getElementById('name-color').value = s['--name-color'];
     document.getElementById('name-size').value = s['--name-size'].replace('cqw', '');
@@ -475,7 +500,6 @@ function updateSettingsUI() {
     document.getElementById('name-shadow').checked = s['--name-shadow'] !== 'none';
     document.getElementById('name-outline').checked = s['--name-stroke'] !== '0px transparent';
 
-    // Music
     document.getElementById('music-font').value = s['--music-font'];
     document.getElementById('music-color').value = s['--music-color'];
     document.getElementById('music-size').value = s['--music-size'].replace('cqw', '');
@@ -486,7 +510,7 @@ function updateSettingsUI() {
     document.getElementById('music-shadow').checked = s['--music-shadow'] !== 'none';
 }
 
-// --- RESET LOGIC (Refactored) ---
+// --- RESET LOGIC ---
 function resetApp() {
     if(confirm("Are you sure you want to reset everything? All images and text will be lost.")) {
         localStorage.removeItem('memeState');
