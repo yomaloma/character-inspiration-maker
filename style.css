@@ -82,12 +82,12 @@ button:hover {
     min-height: 0;
     min-width: 0;
     touch-action: none; 
+    overflow: hidden; /* Prevents any cell from blowing out the grid */
 }
 
 /* Image Cells (Sides) */
 .img-cell {
     border: 3px solid var(--border-color);
-    overflow: hidden; 
     background-color: #fafafa;
     cursor: pointer;
     z-index: 10; 
@@ -106,15 +106,15 @@ button:hover {
 
 .uploaded-img {
     position: absolute;
-    left: 50%; /* Centers the image */
-    top: 50%; /* Centers the image */
+    left: 50%; 
+    top: 50%; 
     max-width: none;
     cursor: grab;
     user-select: none;
     -webkit-user-drag: none;
     display: none;
     touch-action: none; 
-    transform-origin: center center; /* Zooms from the middle */
+    transform-origin: center center; 
 }
 
 .uploaded-img:active {
@@ -123,7 +123,7 @@ button:hover {
 
 /* Center Art Cell */
 .center-art-cell {
-    overflow: visible; 
+    overflow: visible; /* Override to allow character to spill over */
     z-index: 5; 
     border: none;
     cursor: pointer;
@@ -141,7 +141,13 @@ button:hover {
     z-index: 20; 
     background: transparent;
     pointer-events: none;
-    overflow: hidden; 
+    
+    /* Rigid box constraints to prevent stretching */
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    min-height: 0; 
+    min-width: 0;
 }
 
 .text-cell > * {
@@ -172,6 +178,7 @@ button:hover {
     overflow-y: auto;
     word-break: break-word;
     overflow-wrap: break-word;
+    flex-shrink: 1; /* Allows text to shrink instead of pushing the cell */
 }
 
 /* Seamless Character Name */
@@ -189,6 +196,7 @@ button:hover {
     min-height: 1.5em; 
     word-break: break-word;
     overflow-wrap: break-word;
+    flex-shrink: 1;
 }
 
 #char-name:empty:before {
@@ -212,13 +220,15 @@ button:hover {
     outline: none;
     text-align: center;
     width: 100%;
-    height: 100%; 
+    
+    /* Flex fix for text overflow */
+    flex: 1; 
+    min-height: 0; /* CRITICAL: forces scrolling instead of expanding */
     overflow-y: auto; 
+    
     word-break: break-word;
     overflow-wrap: break-word;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+    display: block; /* Better for text than flex */
 }
 
 #music-box:empty:before {
