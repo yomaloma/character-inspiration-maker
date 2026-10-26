@@ -387,8 +387,10 @@ function updateStyleVariable(key, value, uiElementId) {
 }
 
 const bindings = [
-    { id: 'bg-color', prop: '--poster-bg', event: 'input' },
-    { id: 'border-color', prop: '--border-color', event: 'input' },
+    // Changed 'input' to 'change' for all color pickers to prevent mobile render crashes
+    { id: 'bg-color', prop: '--poster-bg', event: 'change' },
+    { id: 'border-color', prop: '--border-color', event: 'change' },
+    
     { id: 'border-thickness', prop: '--border-thickness', event: 'input', suffix: 'px' },
     { id: 'border-style', prop: '--border-style', event: 'change' },
     { id: 'border-radius', prop: '--border-radius', event: 'input', suffix: 'px' },
@@ -396,7 +398,7 @@ const bindings = [
     { id: 'show-line', prop: '--show-line', event: 'change', type: 'checkbox' },
     
     { id: 'title-font', prop: '--title-font', event: 'change' },
-    { id: 'title-color', prop: '--title-color', event: 'input' },
+    { id: 'title-color', prop: '--title-color', event: 'change' },
     { id: 'title-size', prop: '--title-size', event: 'input', suffix: 'cqw' },
     { id: 'title-align', prop: '--title-align', event: 'change' },
     { id: 'title-tracking', prop: '--title-tracking', event: 'input', suffix: 'px' },
@@ -404,7 +406,7 @@ const bindings = [
     { id: 'title-outline', prop: '--title-stroke', event: 'change', type: 'checkbox' },
 
     { id: 'name-font', prop: '--name-font', event: 'change' },
-    { id: 'name-color', prop: '--name-color', event: 'input' },
+    { id: 'name-color', prop: '--name-color', event: 'change' },
     { id: 'name-size', prop: '--name-size', event: 'input', suffix: 'cqw' },
     { id: 'name-align', prop: '--name-align', event: 'change' },
     { id: 'name-tracking', prop: '--name-tracking', event: 'input', suffix: 'px' },
@@ -412,7 +414,7 @@ const bindings = [
     { id: 'name-outline', prop: '--name-stroke', event: 'change', type: 'checkbox' },
 
     { id: 'music-font', prop: '--music-font', event: 'change' },
-    { id: 'music-color', prop: '--music-color', event: 'input' },
+    { id: 'music-color', prop: '--music-color', event: 'change' },
     { id: 'music-size', prop: '--music-size', event: 'input', suffix: 'cqw' },
     { id: 'music-align', prop: '--music-align', event: 'change' },
     { id: 'music-tracking', prop: '--music-tracking', event: 'input', suffix: 'px' },

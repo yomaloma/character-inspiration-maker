@@ -258,6 +258,7 @@ button:hover { background-color: #333; }
     font-family: var(--title-font);
     font-size: var(--title-size); 
     color: var(--title-color);
+    -webkit-text-fill-color: var(--title-color); /* Fix mobile rendering */
     text-align: var(--title-align);
     letter-spacing: var(--title-tracking);
     text-shadow: var(--title-shadow);
@@ -279,6 +280,7 @@ button:hover { background-color: #333; }
     font-family: var(--name-font);
     font-size: var(--name-size);
     color: var(--name-color);
+    -webkit-text-fill-color: var(--name-color); /* Fix mobile rendering */
     text-align: var(--name-align);
     letter-spacing: var(--name-tracking);
     text-shadow: var(--name-shadow);
@@ -315,6 +317,7 @@ button:hover { background-color: #333; }
     font-family: var(--music-font);
     font-size: var(--music-size);
     color: var(--music-color);
+    -webkit-text-fill-color: var(--music-color); /* Fix mobile rendering */
     text-align: var(--music-align);
     letter-spacing: var(--music-tracking);
     text-shadow: var(--music-shadow);
