@@ -59,7 +59,6 @@ button:hover {
 #poster {
     display: grid;
     grid-template-columns: 1fr 1.3fr 1fr;
-    /* THIS FIXES THE STRETCHING: minmax(0, 1fr) forces rows to stay equal */
     grid-template-rows: repeat(3, minmax(0, 1fr)); 
     gap: 15px;
     width: 100%;
@@ -71,8 +70,6 @@ button:hover {
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     position: relative; 
     touch-action: none; 
-    
-    /* Enable Container Queries */
     container-type: inline-size;
 }
 
@@ -109,12 +106,15 @@ button:hover {
 
 .uploaded-img {
     position: absolute;
+    left: 50%; /* Centers the image */
+    top: 50%; /* Centers the image */
     max-width: none;
     cursor: grab;
     user-select: none;
     -webkit-user-drag: none;
     display: none;
     touch-action: none; 
+    transform-origin: center center; /* Zooms from the middle */
 }
 
 .uploaded-img:active {
@@ -159,7 +159,6 @@ button:hover {
     scrollbar-width: none;  
 }
 
-/* CONTAINER QUERIES: Font size scales with the poster width, not the screen width */
 #display-title {
     font-size: 4.5cqw; 
     font-weight: 900;

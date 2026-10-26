@@ -1,8 +1,10 @@
 let activeImg = null;
 let startX = 0, startY = 0;
 let initialX = 0, initialY = 0;
+let isPinching = false;
+let touchDistance = 0;
 
-// 1. Load Image Function
+// 1. Load Image Function & Auto-Fit
 function loadImage(event, imgId) {
     const file = event.target.files[0];
     if (file) {
@@ -10,28 +12,59 @@ function loadImage(event, imgId) {
         reader.onload = function(e) {
             const img = document.getElementById(imgId);
             const label = document.getElementById('label' + imgId.replace('img', ''));
+            const cell = img.parentElement;
             
             img.src = e.target.result;
             img.style.display = 'block';
             if(label) label.style.display = 'none';
             
-            // Reset position and scale
-            img.style.left = '50%';
-            img.style.top = '50%';
-            img.style.transform = 'translate(-50%, -50%) scale(1)';
-            img.dataset.scale = 1;
+            // Wait for image to load to calculate dimensions
+            img.onload = function() {
+                const cellWidth = cell.clientWidth;
+                const cellHeight = cell.clientHeight;
+                const imgWidth = img.naturalWidth;
+                const imgHeight = img.naturalHeight;
+
+                // Calculate scale to "contain" the image within the cell
+                const scaleX = cellWidth / imgWidth;
+                const scaleY = cellHeight / imgHeight;
+                let fitScale = Math.min(scaleX, scaleY); 
+
+                // If the image is tiny, don't scale it up past 100%
+                if (imgWidth < cellWidth && imgHeight < cellHeight) {
+                    fitScale = 1;
+                }
+
+                // Set initial dataset values
+                img.dataset.scale = fitScale;
+                img.dataset.x = 0;
+                img.dataset.y = 0;
+                
+                applyTransform(img);
+            };
         }
         reader.readAsDataURL(file);
     }
 }
 
-// 2. Drag & Drop (Panning) Logic
+// 2. Helper function to apply centered transforms
+function applyTransform(img) {
+    const s = parseFloat(img.dataset.scale) || 1;
+    const x = parseFloat(img.dataset.x) || 0;
+    const y = parseFloat(img.dataset.y) || 0;
+    
+    // translate(-50%, -50%) centers the image first, then we add the drag offsets (x, y)
+    img.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(${s})`;
+}
+
+// 3. Drag & Drop (Panning) Logic
 document.querySelectorAll('.uploaded-img').forEach(img => {
     img.addEventListener('pointerdown', dragStart);
 });
 
 function dragStart(e) {
     if (e.pointerType === 'touch' && e.isPrimary === false) return;
+    if (isPinching) return;
 
     activeImg = e.target;
     activeImg.setPointerCapture(e.pointerId);
@@ -39,29 +72,24 @@ function dragStart(e) {
     startX = e.clientX;
     startY = e.clientY;
     
-    const style = window.getComputedStyle(activeImg);
-    const matrix = new WebKitCSSMatrix(style.transform);
-    initialX = matrix.m41;
-    initialY = matrix.m42;
+    initialX = parseFloat(activeImg.dataset.x) || 0;
+    initialY = parseFloat(activeImg.dataset.y) || 0;
+    
+    // Prevent default drag ghost image
+    e.preventDefault(); 
 }
 
 document.addEventListener('pointermove', (e) => {
-    if (!activeImg) return;
-    
+    if (!activeImg || isPinching) return;
     if(e.pointerType === 'touch') e.preventDefault();
 
     const dx = e.clientX - startX;
     const dy = e.clientY - startY;
     
-    const newX = initialX + dx;
-    const newY = initialY + dy;
+    activeImg.dataset.x = initialX + dx;
+    activeImg.dataset.y = initialY + dy;
     
-    const currentScale = parseFloat(activeImg.dataset.scale) || 1;
-    activeImg.style.transform = `translate(${newX}px, ${newY}px) scale(${currentScale})`;
-    
-    activeImg.style.left = '0';
-    activeImg.style.top = '0';
-    activeImg.style.transformOrigin = 'top left';
+    applyTransform(activeImg);
 });
 
 document.addEventListener('pointerup', (e) => {
@@ -71,45 +99,32 @@ document.addEventListener('pointerup', (e) => {
     }
 });
 
-document.addEventListener('pointercancel', () => {
-    activeImg = null;
-});
-
-// 3. Mouse Wheel Zoom (Desktop)
+// 4. Mouse Wheel Zoom (Desktop)
 document.querySelectorAll('.cell').forEach(cell => {
     cell.addEventListener('wheel', (e) => {
         if (e.target.classList.contains('uploaded-img')) {
             e.preventDefault();
             
             let currentScale = parseFloat(e.target.dataset.scale) || 1;
-            const zoomSensitivity = 0.001;
-            
-            currentScale -= e.deltaY * zoomSensitivity;
-            currentScale = Math.min(Math.max(0.2, currentScale), 10); 
+            currentScale -= e.deltaY * 0.002; // Adjusted sensitivity
+            currentScale = Math.min(Math.max(0.1, currentScale), 10); 
             
             e.target.dataset.scale = currentScale;
-            
-            const style = window.getComputedStyle(e.target);
-            const matrix = new WebKitCSSMatrix(style.transform);
-            const currentX = matrix.m41;
-            const currentY = matrix.m42;
-            
-            e.target.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
+            applyTransform(e.target);
         }
     }, { passive: false });
 });
 
-// 4. Pinch-to-Zoom (Mobile)
-let touchDistance = 0;
-
+// 5. Pinch-to-Zoom (Mobile)
 document.querySelectorAll('.uploaded-img').forEach(img => {
     img.addEventListener('touchstart', (e) => {
         if (e.touches.length === 2) {
+            isPinching = true;
+            activeImg = null; // Stop dragging while pinching
             touchDistance = Math.hypot(
                 e.touches[0].pageX - e.touches[1].pageX,
                 e.touches[0].pageY - e.touches[1].pageY
             );
-            activeImg = null; 
         }
     }, { passive: false });
 
@@ -125,26 +140,31 @@ document.querySelectorAll('.uploaded-img').forEach(img => {
             let currentScale = parseFloat(img.dataset.scale) || 1;
             const ratio = newDistance / touchDistance;
             let newScale = currentScale * ratio;
-            newScale = Math.min(Math.max(0.2, newScale), 10); 
+            newScale = Math.min(Math.max(0.1, newScale), 10); 
             
             img.dataset.scale = newScale;
-            
-            const style = window.getComputedStyle(img);
-            const matrix = new WebKitCSSMatrix(style.transform);
-            const currentX = matrix.m41;
-            const currentY = matrix.m42;
-            
-            img.style.transform = `translate(${currentX}px, ${currentY}px) scale(${newScale})`;
+            applyTransform(img);
             
             touchDistance = newDistance;
         }
     }, { passive: false });
+
+    img.addEventListener('touchend', (e) => {
+        if (e.touches.length < 2) {
+            isPinching = false;
+        }
+    });
 });
 
-// 5. Download Logic (Forced 800x800 Square output)
+// 6. Download Logic (Proportional Scaling Fix)
 document.getElementById('download-btn').addEventListener('click', function() {
     const poster = document.getElementById('poster');
     
+    // Get current physical width (e.g., 350px on a phone) to calculate the ratio
+    const originalWidth = poster.offsetWidth; 
+    const targetWidth = 800; 
+    const ratio = targetWidth / originalWidth;
+
     const uploadLabels = document.querySelectorAll('.upload-label');
     uploadLabels.forEach(el => el.style.opacity = '0');
 
@@ -153,12 +173,27 @@ document.getElementById('download-btn').addEventListener('click', function() {
         backgroundColor: '#ffffff',
         logging: false,
         useCORS: true,
-        // Force the hidden clone to be perfectly square so it doesn't squish on download
         onclone: (clonedDoc) => {
             const clonedPoster = clonedDoc.getElementById('poster');
-            clonedPoster.style.width = '800px';
-            clonedPoster.style.height = '800px';
-            clonedPoster.style.aspectRatio = 'auto'; // Override to prevent conflicts
+            // Force the clone to be exactly 800x800
+            clonedPoster.style.width = targetWidth + 'px';
+            clonedPoster.style.height = targetWidth + 'px';
+            clonedPoster.style.aspectRatio = 'auto';
+
+            // Proportionally resize the image coordinates and scales in the clone
+            const clonedImages = clonedDoc.querySelectorAll('.uploaded-img');
+            clonedImages.forEach(img => {
+                let s = parseFloat(img.dataset.scale) || 1;
+                let x = parseFloat(img.dataset.x) || 0;
+                let y = parseFloat(img.dataset.y) || 0;
+
+                // Multiply everything by the ratio so it looks exactly like the mobile view
+                s = s * ratio;
+                x = x * ratio;
+                y = y * ratio;
+
+                img.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(${s})`;
+            });
         }
     }).then(canvas => {
         uploadLabels.forEach(el => el.style.opacity = '1');
