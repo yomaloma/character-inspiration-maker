@@ -335,6 +335,39 @@ button:hover { background-color: #333; }
     font-style: italic;
 }
 
+/* --- CROP MODAL --- */
+.crop-content {
+    max-width: 600px;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.crop-body {
+    flex: 1;
+    background: #333;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#crop-image {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+}
+
+.crop-footer {
+    padding: 15px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background: white;
+    border-top: 1px solid #eee;
+}
+
 /* --- SETTINGS OVERLAY & TABS --- */
 .overlay {
     position: fixed;

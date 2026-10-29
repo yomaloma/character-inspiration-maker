@@ -200,41 +200,105 @@ function compressImage(file, callback) {
     reader.readAsDataURL(file);
 }
 
-function loadImage(event, imgId) {
+// --- CROP LOGIC ---
+let cropperInstance = null;
+let currentCropTarget = null;
+
+function handleFileSelect(event, imgId) {
     const file = event.target.files[0];
     if (file) {
-        compressImage(file, function(compressedDataUrl) {
-            if (!compressedDataUrl) return;
-
-            const img = document.getElementById(imgId);
-            const label = document.getElementById('label' + imgId.replace('img', ''));
-            const cell = img.parentElement;
+        currentCropTarget = imgId;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const cropModal = document.getElementById('crop-modal');
+            const cropImg = document.getElementById('crop-image');
             
-            img.onload = function() {
-                const cellWidth = cell.clientWidth;
-                const cellHeight = cell.clientHeight;
-                const imgWidth = img.naturalWidth;
-                const imgHeight = img.naturalHeight;
-
-                let fitScale = Math.min(cellWidth / imgWidth, cellHeight / imgHeight);
-                if (imgWidth < cellWidth && imgHeight < cellHeight) fitScale = 1;
-
-                appState.images[imgId] = { src: compressedDataUrl, scale: fitScale, x: 0, y: 0 };
-                saveState();
-
-                img.dataset.scale = fitScale;
-                img.dataset.x = 0;
-                img.dataset.y = 0;
-                applyTransform(img);
-                img.onload = null;
-            };
-
-            img.src = compressedDataUrl;
-            img.style.display = 'block';
-            if(label) label.style.display = 'none';
-            document.getElementById('delete-' + imgId).style.display = 'flex';
-        });
+            cropImg.src = e.target.result;
+            cropModal.classList.add('active');
+            
+            if (cropperInstance) cropperInstance.destroy();
+            
+            cropperInstance = new Cropper(cropImg, {
+                viewMode: 1, // Restrict crop box to not exceed canvas
+                autoCropArea: 1, // Default crop box covers full image
+                background: false,
+                responsive: true,
+                restore: false
+            });
+        };
+        reader.readAsDataURL(file);
     }
+    // Reset input so the same file can be selected again if needed
+    event.target.value = '';
+}
+
+document.getElementById('crop-cancel-btn').addEventListener('click', () => {
+    document.getElementById('crop-modal').classList.remove('active');
+    if (cropperInstance) {
+        cropperInstance.destroy();
+        cropperInstance = null;
+    }
+});
+
+document.getElementById('crop-apply-btn').addEventListener('click', () => {
+    if (!cropperInstance || !currentCropTarget) return;
+    
+    // Get cropped canvas
+    const canvas = cropperInstance.getCroppedCanvas({
+        maxWidth: 1000,
+        maxHeight: 1000
+    });
+    
+    // Convert to WebP to preserve transparency and keep size small
+    let dataUrl;
+    try {
+        dataUrl = canvas.toDataURL('image/webp', 0.8);
+    } catch(err) {
+        dataUrl = canvas.toDataURL('image/png');
+    }
+    
+    if (!dataUrl.startsWith('data:image/webp') && !dataUrl.startsWith('data:image/png')) {
+        dataUrl = canvas.toDataURL('image/png');
+    }
+
+    // Pass to insertion logic
+    insertProcessedImage(dataUrl, currentCropTarget);
+    
+    // Clean up
+    document.getElementById('crop-modal').classList.remove('active');
+    cropperInstance.destroy();
+    cropperInstance = null;
+});
+
+// Replaces the old loadImage logic
+function insertProcessedImage(dataUrl, imgId) {
+    const img = document.getElementById(imgId);
+    const label = document.getElementById('label' + imgId.replace('img', ''));
+    const cell = img.parentElement;
+    
+    img.onload = function() {
+        const cellWidth = cell.clientWidth;
+        const cellHeight = cell.clientHeight;
+        const imgWidth = img.naturalWidth;
+        const imgHeight = img.naturalHeight;
+
+        let fitScale = Math.min(cellWidth / imgWidth, cellHeight / imgHeight);
+        if (imgWidth < cellWidth && imgHeight < cellHeight) fitScale = 1;
+
+        appState.images[imgId] = { src: dataUrl, scale: fitScale, x: 0, y: 0 };
+        saveState();
+
+        img.dataset.scale = fitScale;
+        img.dataset.x = 0;
+        img.dataset.y = 0;
+        applyTransform(img);
+        img.onload = null;
+    };
+
+    img.src = dataUrl;
+    img.style.display = 'block';
+    if(label) label.style.display = 'none';
+    document.getElementById('delete-' + imgId).style.display = 'flex';
 }
 
 function clearImage(e, imgId) {
