@@ -135,12 +135,20 @@ document.querySelectorAll('[contenteditable="true"]').forEach(el => {
 });
 
 // --- IMAGE LOGIC ---
+// --- IMAGE LOGIC ---
 let activeImg = null;
 let startX = 0, startY = 0;
 let initialX = 0, initialY = 0;
 let isPinching = false;
-let touchDistance = 0;
-let didDrag = false; // Used to differentiate between a tap and a drag
+let didDrag = false;
+
+// Variables for stable pinch-to-zoom
+let startPinchDistance = 0;
+let startPinchScale = 1;
+let startPinchX = 0, startPinchY = 0;
+let startPinchMidX = 0, startPinchMidY = 0;
+let startPinchOffsetX = 0, startPinchOffsetY = 0;
+let pinchRaf = null; 
 
 function compressImage(file, callback) {
     const reader = new FileReader();
@@ -302,7 +310,7 @@ document.addEventListener('pointerup', (e) => {
     }
 });
 
-// Wheel zoom
+// Wheel zoom (Desktop)
 document.querySelectorAll('.cell').forEach(cell => {
     cell.addEventListener('wheel', (e) => {
         if (e.target.classList.contains('uploaded-img')) {
@@ -320,35 +328,95 @@ document.querySelectorAll('.cell').forEach(cell => {
     }, { passive: false });
 });
 
-// Pinch zoom
+// --- STABLE PINCH ZOOM (Mobile) ---
 document.querySelectorAll('.uploaded-img').forEach(img => {
     img.addEventListener('touchstart', (e) => {
         if (e.touches.length === 2) {
             isPinching = true;
             activeImg = null; 
-            touchDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+            
+            const t1 = e.touches[0];
+            const t2 = e.touches[1];
+            
+            // 1. Lock the initial distance and scale
+            startPinchDistance = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+            if (startPinchDistance < 10) startPinchDistance = 10; // Prevent division by zero
+            
+            startPinchMidX = (t1.clientX + t2.clientX) / 2;
+            startPinchMidY = (t1.clientY + t2.clientY) / 2;
+            
+            startPinchScale = parseFloat(img.dataset.scale) || 1;
+            startPinchX = parseFloat(img.dataset.x) || 0;
+            startPinchY = parseFloat(img.dataset.y) || 0;
+            
+            // 2. Calculate offset of fingers relative to the image's center
+            const cellRect = img.parentElement.getBoundingClientRect();
+            const cellCenterX = cellRect.left + cellRect.width / 2;
+            const cellCenterY = cellRect.top + cellRect.height / 2;
+            
+            const imgCenterX = cellCenterX + startPinchX;
+            const imgCenterY = cellCenterY + startPinchY;
+            
+            startPinchOffsetX = startPinchMidX - imgCenterX;
+            startPinchOffsetY = startPinchMidY - imgCenterY;
         }
     }, { passive: false });
 
     img.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 2) {
+        if (e.touches.length === 2 && isPinching) {
             e.preventDefault(); 
-            const newDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
-            let currentScale = parseFloat(img.dataset.scale) || 1;
-            let newScale = currentScale * (newDistance / touchDistance);
+            
+            const t1 = e.touches[0];
+            const t2 = e.touches[1];
+            
+            const currentDistance = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+            const currentMidX = (t1.clientX + t2.clientX) / 2;
+            const currentMidY = (t1.clientY + t2.clientY) / 2;
+            
+            // 1. Calculate new scale based on INITIAL locked distance
+            let scaleMultiplier = currentDistance / startPinchDistance;
+            let newScale = startPinchScale * scaleMultiplier;
             newScale = Math.min(Math.max(0.1, newScale), 10); 
+            
+            // 2. Calculate how much the fingers moved (Panning)
+            const deltaMidX = currentMidX - startPinchMidX;
+            const deltaMidY = currentMidY - startPinchMidY;
+            
+            // 3. Anchor compensation: Scale from the midpoint of the fingers
+            const scaleChange = newScale - startPinchScale;
+            const anchorAdjustX = - (scaleChange / startPinchScale) * startPinchOffsetX;
+            const anchorAdjustY = - (scaleChange / startPinchScale) * startPinchOffsetY;
+            
+            // 4. Apply new math to dataset
             img.dataset.scale = newScale;
-            applyTransform(img);
-            touchDistance = newDistance;
-            if (appState.images[img.id]) {
-                appState.images[img.id].scale = newScale;
-                saveState();
+            img.dataset.x = startPinchX + deltaMidX + anchorAdjustX;
+            img.dataset.y = startPinchY + deltaMidY + anchorAdjustY;
+            
+            // 5. Throttle rendering using requestAnimationFrame to stop Safari shakiness
+            if (!pinchRaf) {
+                pinchRaf = requestAnimationFrame(() => {
+                    img.style.transform = `translate(calc(-50% + ${img.dataset.x}px), calc(-50% + ${img.dataset.y}px)) scale(${img.dataset.scale})`;
+                    pinchRaf = null;
+                });
             }
         }
     }, { passive: false });
 
     img.addEventListener('touchend', (e) => {
-        if (e.touches.length < 2) isPinching = false;
+        if (e.touches.length < 2) {
+            isPinching = false;
+            // Save final state
+            if (appState.images[img.id]) {
+                appState.images[img.id].scale = img.dataset.scale;
+                appState.images[img.id].x = img.dataset.x;
+                appState.images[img.id].y = img.dataset.y;
+                saveState();
+            }
+        }
+    });
+    
+    img.addEventListener('touchcancel', (e) => {
+        isPinching = false;
     });
 });
 
