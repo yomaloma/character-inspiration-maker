@@ -48,9 +48,7 @@
     </div>
 
     <!-- Settings Overlay -->
-    <!-- ... [Keep the Settings Overlay EXACTLY as it is in your current file] ... -->
     <div id="settings-overlay" class="overlay">
-        <!-- ... Settings content ... -->
         <div class="overlay-content">
             <div class="overlay-header">
                 <h2>Customize</h2>
@@ -66,29 +64,111 @@
             </div>
 
             <div class="settings-scroll">
+                
+                <!-- THEME TAB -->
                 <div id="tab-theme" class="tab-pane active">
-                    <div class="settings-group"><h3>Colors</h3><label>Poster Background <input type="color" id="bg-color" value="#ffffff"></label><label>Box Border Color <input type="color" id="border-color" value="#000000"></label></div>
-                    <div class="settings-group"><h3>Borders</h3><label>Thickness <div class="slider-group"><input type="range" id="border-thickness" min="0" max="10" step="1" value="3"><span id="border-thickness-val">3</span>px</div></label><label>Style <select id="border-style"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option><option value="double">Double</option></select></label><label>Corners <div class="slider-group"><input type="range" id="border-radius" min="0" max="50" step="1" value="0"><span id="border-radius-val">0</span>px</div></label></div>
-                    <div class="settings-group"><h3>Layout</h3><label>Show Title Line <input type="checkbox" id="show-line" checked></label><label>Show Image Borders <input type="checkbox" id="show-borders" checked></label></div>
+                    <div class="settings-group">
+                        <h3>Colors</h3>
+                        <div class="color-picker-row">
+                            <span>Poster Background</span>
+                            <div class="color-inputs">
+                                <input type="color" id="bg-color" value="#ffffff">
+                                <input type="text" id="bg-color-text" class="hex-input" value="#ffffff" maxlength="7" spellcheck="false">
+                            </div>
+                        </div>
+                        <div class="color-picker-row">
+                            <span>Box Border Color</span>
+                            <div class="color-inputs">
+                                <input type="color" id="border-color" value="#000000">
+                                <input type="text" id="border-color-text" class="hex-input" value="#000000" maxlength="7" spellcheck="false">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-group">
+                        <h3>Borders</h3>
+                        <label>Thickness <div class="slider-group"><input type="range" id="border-thickness" min="0" max="10" step="1" value="3"><span id="border-thickness-val">3</span>px</div></label>
+                        <label>Style <select id="border-style"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option><option value="double">Double</option></select></label>
+                        <label>Corners <div class="slider-group"><input type="range" id="border-radius" min="0" max="50" step="1" value="0"><span id="border-radius-val">0</span>px</div></label>
+                    </div>
+                    <div class="settings-group">
+                        <h3>Layout</h3>
+                        <label>Show Title Line <input type="checkbox" id="show-line" checked></label>
+                        <label>Show Image Borders <input type="checkbox" id="show-borders" checked></label>
+                    </div>
                 </div>
+
+                <!-- TITLE TAB -->
                 <div id="tab-title" class="tab-pane">
-                    <div class="settings-group"><h3>Title Settings</h3><label>Font <select id="title-font" class="font-select"></select></label><label>Color <input type="color" id="title-color" value="#000000"></label><label>Size <div class="slider-group"><input type="range" id="title-size" min="2" max="8" step="0.5" value="4.5"><span id="title-size-val">4.5</span></div></label><label>Alignment <select id="title-align"><option value="center">Center</option><option value="left">Left</option><option value="right">Right</option></select></label><label>Tracking <div class="slider-group"><input type="range" id="title-tracking" min="-2" max="10" step="0.5" value="0"><span id="title-tracking-val">0</span>px</div></label><label>Text Shadow <input type="checkbox" id="title-shadow"></label><label>Text Outline <input type="checkbox" id="title-outline"></label></div>
+                    <div class="settings-group">
+                        <h3>Title Settings</h3>
+                        <label>Font <select id="title-font" class="font-select"></select></label>
+                        <div class="color-picker-row">
+                            <span>Color</span>
+                            <div class="color-inputs">
+                                <input type="color" id="title-color" value="#000000">
+                                <input type="text" id="title-color-text" class="hex-input" value="#000000" maxlength="7" spellcheck="false">
+                            </div>
+                        </div>
+                        <label>Size <div class="slider-group"><input type="range" id="title-size" min="2" max="8" step="0.5" value="4.5"><span id="title-size-val">4.5</span></div></label>
+                        <label>Alignment <select id="title-align"><option value="center">Center</option><option value="left">Left</option><option value="right">Right</option></select></label>
+                        <label>Tracking <div class="slider-group"><input type="range" id="title-tracking" min="-2" max="10" step="0.5" value="0"><span id="title-tracking-val">0</span>px</div></label>
+                        <label>Text Shadow <input type="checkbox" id="title-shadow"></label>
+                        <label>Text Outline <input type="checkbox" id="title-outline"></label>
+                    </div>
                 </div>
+
+                <!-- NAME TAB -->
                 <div id="tab-name" class="tab-pane">
-                    <div class="settings-group"><h3>Character Name Settings</h3><label>Font <select id="name-font" class="font-select"></select></label><label>Color <input type="color" id="name-color" value="#555555"></label><label>Size <div class="slider-group"><input type="range" id="name-size" min="1.5" max="6" step="0.5" value="3"><span id="name-size-val">3</span></div></label><label>Alignment <select id="name-align"><option value="center">Center</option><option value="left">Left</option><option value="right">Right</option></select></label><label>Tracking <div class="slider-group"><input type="range" id="name-tracking" min="-2" max="10" step="0.5" value="0"><span id="name-tracking-val">0</span>px</div></label><label>Text Shadow <input type="checkbox" id="name-shadow"></label><label>Text Outline <input type="checkbox" id="name-outline"></label></div>
+                    <div class="settings-group">
+                        <h3>Character Name Settings</h3>
+                        <label>Font <select id="name-font" class="font-select"></select></label>
+                        <div class="color-picker-row">
+                            <span>Color</span>
+                            <div class="color-inputs">
+                                <input type="color" id="name-color" value="#555555">
+                                <input type="text" id="name-color-text" class="hex-input" value="#555555" maxlength="7" spellcheck="false">
+                            </div>
+                        </div>
+                        <label>Size <div class="slider-group"><input type="range" id="name-size" min="1.5" max="6" step="0.5" value="3"><span id="name-size-val">3</span></div></label>
+                        <label>Alignment <select id="name-align"><option value="center">Center</option><option value="left">Left</option><option value="right">Right</option></select></label>
+                        <label>Tracking <div class="slider-group"><input type="range" id="name-tracking" min="-2" max="10" step="0.5" value="0"><span id="name-tracking-val">0</span>px</div></label>
+                        <label>Text Shadow <input type="checkbox" id="name-shadow"></label>
+                        <label>Text Outline <input type="checkbox" id="name-outline"></label>
+                    </div>
                 </div>
+
+                <!-- MUSIC TAB -->
                 <div id="tab-music" class="tab-pane">
-                    <div class="settings-group"><h3>Inspo Music Settings</h3><label>Font <select id="music-font" class="font-select"></select></label><label>Color <input type="color" id="music-color" value="#333333"></label><label>Size <div class="slider-group"><input type="range" id="music-size" min="1.5" max="5" step="0.5" value="2.5"><span id="music-size-val">2.5</span></div></label><label>Alignment <select id="music-align"><option value="center">Center</option><option value="left">Left</option><option value="right">Right</option></select></label><label>Tracking <div class="slider-group"><input type="range" id="music-tracking" min="-2" max="10" step="0.5" value="0"><span id="music-tracking-val">0</span>px</div></label><label>Text Shadow <input type="checkbox" id="music-shadow"></label></div>
+                    <div class="settings-group">
+                        <h3>Inspo Music Settings</h3>
+                        <label>Font <select id="music-font" class="font-select"></select></label>
+                        <div class="color-picker-row">
+                            <span>Color</span>
+                            <div class="color-inputs">
+                                <input type="color" id="music-color" value="#333333">
+                                <input type="text" id="music-color-text" class="hex-input" value="#333333" maxlength="7" spellcheck="false">
+                            </div>
+                        </div>
+                        <label>Size <div class="slider-group"><input type="range" id="music-size" min="1.5" max="5" step="0.5" value="2.5"><span id="music-size-val">2.5</span></div></label>
+                        <label>Alignment <select id="music-align"><option value="center">Center</option><option value="left">Left</option><option value="right">Right</option></select></label>
+                        <label>Tracking <div class="slider-group"><input type="range" id="music-tracking" min="-2" max="10" step="0.5" value="0"><span id="music-tracking-val">0</span>px</div></label>
+                        <label>Text Shadow <input type="checkbox" id="music-shadow"></label>
+                    </div>
                 </div>
+
+                <!-- RESET TAB -->
                 <div id="tab-reset" class="tab-pane">
-                    <div class="settings-group danger-zone"><h3>Danger Zone</h3><p style="font-size: 0.85rem; color: #666; margin-top: 0;">This will permanently delete all uploaded images, text, and custom styles.</p><button id="reset-btn" class="danger-btn">Reset Everything</button></div>
+                    <div class="settings-group danger-zone">
+                        <h3>Danger Zone</h3>
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 0;">This will permanently delete all uploaded images, text, and custom styles.</p>
+                        <button id="reset-btn" class="danger-btn">Reset Everything</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- The Meme Poster (Keep exactly as is) -->
-    <!-- ... [Keep the poster HTML exactly as it is] ... -->
+    <!-- The Meme Poster -->
     <div id="poster">
         <!-- Row 1 -->
         <div class="cell img-cell"><input type="file" id="file1" accept="image/*" onchange="handleFileSelect(event, 'img1')"><div class="delete-btn" id="delete-img1" onclick="clearImage(event, 'img1')">✕</div><span class="upload-label" id="label1">+</span><img class="uploaded-img" id="img1" src="" alt=""></div>

@@ -552,8 +552,7 @@ function updateStyleVariable(key, value, uiElementId) {
 }
 
 const bindings = [
-    { id: 'bg-color', prop: '--poster-bg', event: 'change' },
-    { id: 'border-color', prop: '--border-color', event: 'change' },
+    // NOTE: Color pickers removed from this list, they are handled below
     { id: 'border-thickness', prop: '--border-thickness', event: 'input', suffix: 'px' },
     { id: 'border-style', prop: '--border-style', event: 'change' },
     { id: 'border-radius', prop: '--border-radius', event: 'input', suffix: 'px' },
@@ -561,7 +560,6 @@ const bindings = [
     { id: 'show-line', prop: '--show-line', event: 'change', type: 'checkbox' },
     
     { id: 'title-font', prop: '--title-font', event: 'change' },
-    { id: 'title-color', prop: '--title-color', event: 'change' },
     { id: 'title-size', prop: '--title-size', event: 'input', suffix: 'cqw' },
     { id: 'title-align', prop: '--title-align', event: 'change' },
     { id: 'title-tracking', prop: '--title-tracking', event: 'input', suffix: 'px' },
@@ -569,7 +567,6 @@ const bindings = [
     { id: 'title-outline', prop: '--title-stroke', event: 'change', type: 'checkbox' },
 
     { id: 'name-font', prop: '--name-font', event: 'change' },
-    { id: 'name-color', prop: '--name-color', event: 'change' },
     { id: 'name-size', prop: '--name-size', event: 'input', suffix: 'cqw' },
     { id: 'name-align', prop: '--name-align', event: 'change' },
     { id: 'name-tracking', prop: '--name-tracking', event: 'input', suffix: 'px' },
@@ -577,7 +574,6 @@ const bindings = [
     { id: 'name-outline', prop: '--name-stroke', event: 'change', type: 'checkbox' },
 
     { id: 'music-font', prop: '--music-font', event: 'change' },
-    { id: 'music-color', prop: '--music-color', event: 'change' },
     { id: 'music-size', prop: '--music-size', event: 'input', suffix: 'cqw' },
     { id: 'music-align', prop: '--music-align', event: 'change' },
     { id: 'music-tracking', prop: '--music-tracking', event: 'input', suffix: 'px' },
@@ -599,11 +595,68 @@ bindings.forEach(bind => {
     }
 });
 
+// --- NEW HEX COLOR BINDING SYSTEM ---
+const colorPairs = [
+    { color: 'bg-color', text: 'bg-color-text', prop: '--poster-bg' },
+    { color: 'border-color', text: 'border-color-text', prop: '--border-color' },
+    { color: 'title-color', text: 'title-color-text', prop: '--title-color' },
+    { color: 'name-color', text: 'name-color-text', prop: '--name-color' },
+    { color: 'music-color', text: 'music-color-text', prop: '--music-color' }
+];
+
+colorPairs.forEach(pair => {
+    const colorInput = document.getElementById(pair.color);
+    const textInput = document.getElementById(pair.text);
+
+    // 1. Color Picker -> Text Box
+    colorInput.addEventListener('input', (e) => {
+        textInput.value = e.target.value.toUpperCase();
+        updateStyleVariable(pair.prop, e.target.value, pair.color);
+    });
+
+    // 2. Text Box -> Color Picker (Live typing)
+    textInput.addEventListener('input', (e) => {
+        let val = e.target.value.trim();
+        if (val.length > 0 && !val.startsWith('#')) {
+            val = '#' + val;
+        }
+        
+        // Matches 3 or 6 digit hex codes
+        const hexRegex = /^#([0-9A-F]{3}){1,2}$/i;
+        
+        if (hexRegex.test(val)) {
+            colorInput.value = val;
+            updateStyleVariable(pair.prop, val, pair.color);
+        }
+    });
+
+    // 3. Format and validate on blur (when user clicks away)
+    textInput.addEventListener('blur', (e) => {
+        let val = e.target.value.trim();
+        if (val.length > 0 && !val.startsWith('#')) val = '#' + val;
+        
+        const hexRegex = /^#([0-9A-F]{3}){1,2}$/i;
+        
+        if (!hexRegex.test(val)) {
+            // Revert to the current valid color if the typed code is invalid
+            e.target.value = colorInput.value.toUpperCase();
+        } else {
+            e.target.value = val.toUpperCase();
+            colorInput.value = val;
+            updateStyleVariable(pair.prop, val, pair.color);
+        }
+    });
+});
+
 function updateSettingsUI() {
     const s = appState.styles;
     
+    // Theme
     document.getElementById('bg-color').value = s['--poster-bg'];
+    document.getElementById('bg-color-text').value = s['--poster-bg'];
     document.getElementById('border-color').value = s['--border-color'];
+    document.getElementById('border-color-text').value = s['--border-color'];
+    
     document.getElementById('border-thickness').value = s['--border-thickness'].replace('px', '');
     document.getElementById('border-thickness-val').innerText = s['--border-thickness'].replace('px', '');
     document.getElementById('border-style').value = s['--border-style'];
@@ -612,8 +665,10 @@ function updateSettingsUI() {
     document.getElementById('show-borders').checked = s['--show-borders'];
     document.getElementById('show-line').checked = s['--show-line'] === 'block';
 
+    // Title
     document.getElementById('title-font').value = s['--title-font'];
     document.getElementById('title-color').value = s['--title-color'];
+    document.getElementById('title-color-text').value = s['--title-color'];
     document.getElementById('title-size').value = s['--title-size'].replace('cqw', '');
     document.getElementById('title-size-val').innerText = s['--title-size'].replace('cqw', '');
     document.getElementById('title-align').value = s['--title-align'];
@@ -622,8 +677,10 @@ function updateSettingsUI() {
     document.getElementById('title-shadow').checked = s['--title-shadow'] !== 'none';
     document.getElementById('title-outline').checked = s['--title-stroke'] !== '0px transparent';
 
+    // Name
     document.getElementById('name-font').value = s['--name-font'];
     document.getElementById('name-color').value = s['--name-color'];
+    document.getElementById('name-color-text').value = s['--name-color'];
     document.getElementById('name-size').value = s['--name-size'].replace('cqw', '');
     document.getElementById('name-size-val').innerText = s['--name-size'].replace('cqw', '');
     document.getElementById('name-align').value = s['--name-align'];
@@ -632,8 +689,10 @@ function updateSettingsUI() {
     document.getElementById('name-shadow').checked = s['--name-shadow'] !== 'none';
     document.getElementById('name-outline').checked = s['--name-stroke'] !== '0px transparent';
 
+    // Music
     document.getElementById('music-font').value = s['--music-font'];
     document.getElementById('music-color').value = s['--music-color'];
+    document.getElementById('music-color-text').value = s['--music-color'];
     document.getElementById('music-size').value = s['--music-size'].replace('cqw', '');
     document.getElementById('music-size-val').innerText = s['--music-size'].replace('cqw', '');
     document.getElementById('music-align').value = s['--music-align'];
